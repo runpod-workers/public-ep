@@ -15,7 +15,7 @@ class FluxSchnellGenerator:
             return
         
         # Model path
-        flux_model_path = "/models/flux-schnell"
+        flux_model_path = "/models/flux-flux-schenll"
         
         try:
             # Create pipeline with device_map to handle placement

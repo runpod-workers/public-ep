@@ -29,7 +29,7 @@ async def handler(job):
 runpod.serverless.start(
     {
         "handler": handler,
-        # "concurrency_modifier": lambda x: 500,
+        "concurrency_modifier": 500,
         "return_aggregate_stream": True,
     }
 )
