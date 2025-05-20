@@ -67,6 +67,9 @@ class FluxSchnellGenerator:
         guidance_scale = input_data.get("guidance_scale", 0.0)  # Default for schnell is 0
         seed = input_data.get("seed", None)
         max_sequence_length = input_data.get("max_sequence_length", 256)  # Schnell-specific
+        img_format = input_data.get("image_format", "png")
+        if img_format not in ["png", "jpeg", "jpg"]:
+            raise ValueError("Invalid image format. Supported formats are 'png' and 'jpg'.")
         
         # Set up generator if seed is provided
         generator = None
@@ -87,7 +90,12 @@ class FluxSchnellGenerator:
         
         # Convert to base64
         buffered = io.BytesIO()
-        image.save(buffered, format="PNG")
+        if img_format == "png":
+            image.save(buffered, format="PNG")
+        elif img_format == "jpeg" or img_format == "jpg":
+            image.convert("RGB")
+            # Convert to RGB for JPEG
+            image.save(buffered, format="JPEG")
         img_str = base64.b64encode(buffered.getvalue()).decode()
         
         return img_str

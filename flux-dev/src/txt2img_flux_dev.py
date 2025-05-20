@@ -66,6 +66,9 @@ class FluxDevGenerator:
         steps = input_data.get("num_inference_steps", 30)
         guidance_scale = input_data.get("guidance_scale", 3.5)
         seed = input_data.get("seed", None)
+        img_format = input_data.get("image_format", "png")
+        if img_format not in ["png", "jpeg", "jpg"]:
+            raise ValueError("Invalid image format. Supported formats are 'png' and 'jpg'.")
         
         # Set up generator if seed is provided
         generator = None
@@ -85,7 +88,12 @@ class FluxDevGenerator:
         
         # Convert to base64
         buffered = io.BytesIO()
-        image.save(buffered, format="PNG")
+        if img_format == "png":
+            image.save(buffered, format="PNG")
+        elif img_format == "jpeg" or img_format == "jpg":
+            image.convert("RGB")
+            # Convert to RGB for JPEG
+            image.save(buffered, format="JPEG")
         img_str = base64.b64encode(buffered.getvalue()).decode()
         
         return img_str

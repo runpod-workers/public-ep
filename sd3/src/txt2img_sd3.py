@@ -78,6 +78,9 @@ class SD3Generator:
         width = input_data.get("width", 768)
         steps = input_data.get("num_inference_steps", 20)
         guidance_scale = input_data.get("guidance_scale", 5.0)
+        img_format = input_data.get("image_format", "png")
+        if img_format not in ["png", "jpeg", "jpg"]:
+            raise ValueError("Invalid image format. Supported formats are 'png' and 'jpg'.")
         
         # Generate the image
         image = self.pipe(
@@ -91,7 +94,12 @@ class SD3Generator:
         
         # Convert to base64
         buffered = io.BytesIO()
-        image.save(buffered, format="PNG")
+        if img_format == "png":
+            image.save(buffered, format="PNG")
+        elif img_format == "jpeg" or img_format == "jpg":
+            image.convert("RGB")
+            # Convert to RGB for JPEG
+            image.save(buffered, format="JPEG")
         img_str = base64.b64encode(buffered.getvalue()).decode()
         
         return img_str
