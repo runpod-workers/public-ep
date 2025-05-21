@@ -27,7 +27,8 @@ Once the model is deployed, it exposes an API endpoint that accepts a structured
     "height": "",
     "width": "",
     "num_inference_steps": "",
-    "guidance": ""
+    "guidance": "",
+    "seed": ""
   }
 }
 ```
@@ -42,4 +43,5 @@ Once the model is deployed, it exposes an API endpoint that accepts a structured
 | `width`                | `int`    | Desired width of the output image in pixels. Must be supported by the model.                      |
 | `num_inference_steps`  | `int`    | Number of denoising steps used in the generation process. Higher values yield more detailed images (common range: `20–50`). |
 | `guidance` (CFG Scale) | `float`  | Classifier-Free Guidance Scale. Controls how closely the image follows the prompt (`5–15` is typical). |
+| `seed`                 | `int`  | Setting a consistent seed allows you to reproduce the exact same image when running the code multiple times with the same prompt. |
 
