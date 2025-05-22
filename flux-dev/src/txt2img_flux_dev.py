@@ -3,6 +3,8 @@ import base64
 import io
 from diffusers import FluxPipeline
 from PIL import Image
+from utils import upload_to_r2
+import uuid
 
 class FluxDevGenerator:
     def __init__(self):
@@ -88,12 +90,16 @@ class FluxDevGenerator:
         
         # Convert to base64
         buffered = io.BytesIO()
+        filename = f"gen-images/{uuid.uuid4()}.{img_format}"
         if img_format == "png":
             image.save(buffered, format="PNG")
+            content_type = "image/png"
         elif img_format == "jpeg" or img_format == "jpg":
             image.convert("RGB")
             # Convert to RGB for JPEG
             image.save(buffered, format="JPEG")
-        img_str = base64.b64encode(buffered.getvalue()).decode()
+            content_type = "image/jpeg"
+        buffered.seek(0)
+        url = upload_to_r2(buffered.getvalue(), filename, content_type)
         
-        return img_str
+        return url

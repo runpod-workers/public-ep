@@ -14,12 +14,13 @@ async def handler(job):
     
     mime_type = "image/jpeg" if image_format in ["jpeg", "jpg"] else "image/png"
     try:
-        base64_img = flux_dev.generate(job_input)
+        img_url = flux_dev.generate(job_input)
         return {
             "status": "success",
             "message": "Image generated successfully",
-            "image": base64_img,
-            "data_url": f"data:{mime_type};base64,{base64_img}",
+            "image_url": img_url,
+            # "image": base64_img,
+            # "data_url": f"data:{mime_type};base64,{base64_img}",
         }
     except RuntimeError as e:
         return {

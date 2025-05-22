@@ -14,3 +14,9 @@ accelerate
 sentencepiece
 protobuf
 z3-solver
+boto3
+pillow
+datetime
+pyOpenSSL
+cryptography
+nanoid
