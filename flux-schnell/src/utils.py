@@ -5,7 +5,6 @@ import boto3
 from botocore.client import Config
 import os
 from datetime import datetime, timedelta
-from nanoid import generate
 
 # === Upload function ===
 def upload_to_r2(image_bytes, filename, content_type):
@@ -34,8 +33,7 @@ def upload_to_r2(image_bytes, filename, content_type):
     )
     # Month and date
     
-    now = datetime.now()
-    public_url = f"{os.getenv('PUBLIC_URL')}/{now.month}/{now.day}/{generate(size=10)}/{filename}"
+    public_url = f"{os.getenv('PUBLIC_URL')}/{filename}"
     return public_url
 
 
