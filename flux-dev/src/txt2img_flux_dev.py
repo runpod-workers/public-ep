@@ -5,6 +5,8 @@ from diffusers import FluxPipeline
 from PIL import Image
 from utils import upload_to_r2
 import uuid
+from datetime import datetime, timedelta
+from nanoid import generate
 
 class FluxDevGenerator:
     def __init__(self):
@@ -90,7 +92,8 @@ class FluxDevGenerator:
         
         # Convert to base64
         buffered = io.BytesIO()
-        filename = f"gen-images/{uuid.uuid4()}.{img_format}"
+        now = datetime.now()
+        filename = f"gen-images/{now.month}/{now.day}/{generate(size=10)}/{uuid.uuid4()}.{img_format}"
         if img_format == "png":
             image.save(buffered, format="PNG")
             content_type = "image/png"

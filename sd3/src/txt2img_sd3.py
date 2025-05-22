@@ -6,6 +6,8 @@ from transformers import T5EncoderModel, BitsAndBytesConfig
 from PIL import Image
 from utils import upload_to_r2
 import uuid
+from datetime import datetime, timedelta
+from nanoid import generate
 class SD3Generator:
     def __init__(self):
         self.pipe = None
@@ -95,7 +97,8 @@ class SD3Generator:
         
         # Convert to base64
         buffered = io.BytesIO()
-        filename = f"gen-images/{uuid.uuid4()}.{img_format}"
+        now = datetime.now()
+        filename = f"gen-images/{now.month}/{now.day}/{generate(size=10)}/{uuid.uuid4()}.{img_format}"
         
         
         if img_format == "png":
