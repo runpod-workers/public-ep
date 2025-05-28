@@ -1,0 +1,3 @@
+[submodule "sdxl"]
+	path = sdxl
+	url = https://github.com/runpod-workers/worker-sdxl.git
