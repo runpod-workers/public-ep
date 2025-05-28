@@ -1,7 +1,7 @@
 import torch
 import base64
 import io
-from diffusers import FluxPipeline
+from diffusers import FluxPipeline, FluxTransformer2DModel
 from PIL import Image
 from utils import upload_to_r2
 import uuid
@@ -19,41 +19,23 @@ class FluxSchnellGenerator:
             return
         
         # Model path
-        flux_model_path = "/models/flux-flux-schenll"
+        flux_model_path = "/models/flux-schnell"
+        fp8_transformer_path = "/models/fp8_transformer"
         
-        try:
-            # Create pipeline with device_map to handle placement
-            self.pipe = FluxPipeline.from_pretrained(
-                flux_model_path,
-                torch_dtype=torch.bfloat16,
-                device_map="auto"  # Let diffusers handle device placement
-            )
-            
-            # Enable optimizations
-            if hasattr(self.pipe, "vae"):
-                self.pipe.enable_vae_slicing()
-                self.pipe.enable_vae_tiling()
-                
-            # Apply memory format optimizations
-            if hasattr(self.pipe, "transformer") and not getattr(self.pipe.transformer, "is_quantized", False):
-                self.pipe.transformer.to(memory_format=torch.channels_last)
-            
-            if hasattr(self.pipe, "vae") and not getattr(self.pipe.vae, "is_quantized", False):
-                self.pipe.vae.to(memory_format=torch.channels_last)
-            
-        except Exception as e:
-            print(f"Failed to load with auto device mapping: {e}")
-            print("Falling back to simpler model configuration")
-            
-            # Fallback approach: Basic CPU offloading
-            self.pipe = FluxPipeline.from_pretrained(
-                flux_model_path,
-                torch_dtype=torch.bfloat16
-            )
-            
-            self.pipe.enable_model_cpu_offload()
-            self.pipe.enable_vae_slicing()
-            self.pipe.enable_vae_tiling()
+        # Load the Flux pipeline with optimizations
+        self.pipe = FluxPipeline.from_pretrained(
+            flux_model_path,
+            transformer=None,
+            # text_encoder_2=None,
+            torch_dtype=torch.bfloat16,
+        )
+        
+        transformer = FluxTransformer2DModel.from_single_file(
+            fp8_transformer_path, 
+            torch_dtype=torch.bfloat16
+        )
+        self.pipe.transformer = transformer
+        self.pipe.enable_model_cpu_offload()
         
         self.initialized = True
         
