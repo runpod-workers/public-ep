@@ -20,7 +20,7 @@ class FluxDevGenerator:
         
         # Model path
         flux_model_path = "/models/flux-dev"
-        fp8_transformer_path = "/models/fp8_transformer"
+        fp8_transformer_path = "/models/fp8_transformer/flux1-dev-fp8.safetensors"
         
         # Load the Flux pipeline with optimizations
         self.pipe = FluxPipeline.from_pretrained(
