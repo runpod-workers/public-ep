@@ -3,6 +3,12 @@ INPUT_SCHEMA = {
         'type': str,
         'required': False,
     },
+    'image_format': {
+        'type': str,
+        'required': False,
+        'default': 'png',
+        'constraints': lambda fmt: fmt in ['png', 'jpg', 'jpeg']
+    },
     'negative_prompt': {
         'type': str,
         'required': False,
@@ -38,7 +44,7 @@ INPUT_SCHEMA = {
         'required': False,
         'default': 50
     },
-    'guidance_scale': {
+    'guidance': {
         'type': float,
         'required': False,
         'default': 7.5

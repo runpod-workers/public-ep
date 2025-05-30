@@ -177,7 +177,7 @@ def generate_image(job):
             height=job_input["height"],
             width=job_input["width"],
             num_inference_steps=job_input["num_inference_steps"],
-            guidance_scale=job_input["guidance_scale"],
+            guidance=job_input["guidance"],
             denoising_end=job_input["high_noise_frac"],
             output_type="latent",
             num_images_per_prompt=job_input["num_images"],
@@ -201,14 +201,15 @@ def generate_image(job):
     # Convert to base64
         buffered = io.BytesIO()
         now = datetime.now()
+        img = output[0]  # Assuming we only want the first image
         filename = f"gen-images/{now.month}/{now.day}/{generate(size=10)}/{uuid.uuid4()}.{img_format}"
         if img_format == "png":
-            output.save(buffered, format="PNG")
+            img.save(buffered, format="PNG")
             content_type = "image/png"
         elif img_format == "jpeg" or img_format == "jpg":
-            output.convert("RGB")
+            img.convert("RGB")
             # Convert to RGB for JPEG
-            output.save(buffered, format="JPEG")
+            img.save(buffered, format="JPEG")
             content_type = "image/jpeg"
         buffered.seek(0)
     
