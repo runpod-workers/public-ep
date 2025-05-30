@@ -11,7 +11,7 @@ The worker accepts the following input parameters:
 | `width`                   | `int`   | `1024`   | No        | The width of the generated image in pixels                                                                          |
 | `seed`                    | `int`   | `None`   | No        | Random seed for reproducibility. If `None`, a random seed is generated                                              |
 | `num_inference_steps`     | `int`   | `25`     | No        | Number of denoising steps for the base model                                                                        |                                                                    |
-| `guidance_scale`          | `float` | `7.5`    | No        | Classifier-Free Guidance scale. Higher values lead to images closer to the prompt, lower values more creative       |
+| `guidance`          | `float` | `7.5`    | No        | Classifier-Free Guidance scale. Higher values lead to images closer to the prompt, lower values more creative       |
 
 > [!NOTE]  
 > `prompt` is required
