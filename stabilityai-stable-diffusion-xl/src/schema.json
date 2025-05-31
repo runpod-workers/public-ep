@@ -1,442 +1,202 @@
 {
-  "openapi": "3.1.0",
-  "info": {
-    "title": "Stable Diffusion XL API",
-    "version": "1.0",
-    "description": "Generate high-quality images using Stability AI's SDXL model with enhanced prompt following and resolution support"
-  },
-  "servers": [
-    {
-      "url": "https://api.runpod.ai/v2",
-      "description": "Production server"
-    },
-    {
-      "url": "https://dev-api.runpod.ai/v2",
-      "description": "Development server"
-    }
-  ],
-  "paths": {
-    "/stabilityai-stable-diffusion-xl/{run_type}": {
-      "post": {
-        "summary": "Stable Diffusion XL Image Generation",
-        "description": "Generate high-quality images using Stability AI's SDXL model - supports higher resolutions, better prompt following, and includes refiner options",
-        "operationId": "stable-diffusion-xl",
-        "parameters": [
-          {
-            "name": "run_type",
-            "in": "path",
+  "/stabilityai-stable-diffusion-xl/{run_type}": {
+    "post": {
+      "summary": "Stable Diffusion X",
+      "description": "Generate high-quality images using Stability AI's SDXL model - supports higher resolutions and better prompt following",
+      "operationId": "stable-diffusion-xl",
+      "parameters": [
+        {
+          "name": "run_type",
+          "in": "path",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "run",
+              "runsync"
+            ],
+            "default": "runsync"
+          },
+          "required": true
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
             "schema": {
-              "type": "string",
-              "enum": [
-                "run",
-                "runsync"
-              ],
-              "default": "runsync"
-            },
-            "required": true,
-            "description": "Execution type: 'run' for async, 'runsync' for synchronous"
+              "type": "object",
+              "properties": {
+                "input": {
+                  "properties": {
+                    "prompt": {
+                      "type": "string",
+                      "description": "Text description of the image to generate.",
+                      "default": "a photograph of a dog"
+                    },
+                    "negative_prompt": {
+                      "type": "string",
+                      "description": "Text description of what to avoid in the generated image.",
+                      "default": ""
+                    },
+                    "height": {
+                      "type": "integer",
+                      "description": "Height of the generated image in pixels. Must be multiple of 64. Range: 256-2048",
+                      "default": 1024,
+                      "format": "int32"
+                    },
+                    "width": {
+                      "type": "integer",
+                      "description": "Width of the generated image in pixels. Must be multiple of 64. Range: 256-2048",
+                      "default": 1024,
+                      "format": "int32"
+                    },
+                    "num_inference_steps": {
+                      "type": "integer",
+                      "description": "Number of denoising steps. More steps generally produce higher quality. Range: 1-50",
+                      "default": 25,
+                      "format": "int32"
+                    },
+                    "guidance": {
+                      "type": "number",
+                      "description": "Guidance scale. Higher values follow the prompt more closely. Range: 1.0-20.0",
+                      "default": 7.5,
+                      "format": "float"
+                    },
+                    "seed": {
+                      "type": "integer",
+                      "description": "Random seed for reproducible results. Use 0 for random seed.",
+                      "default": 0,
+                      "format": "int32"
+                    }
+                  },
+                  "required": [
+                    "prompt"
+                  ],
+                  "type": "object",
+                  "description": "Input object contains prompt and generation parameters."
+                }
+              }
+            }
           }
-        ],
-        "requestBody": {
-          "required": true,
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "200",
           "content": {
             "application/json": {
+              "examples": {
+                "Async Result": {
+                  "value": "{\n  \"id\": \"a20e645a-a518-42ec-954c-2127ad50a6d1-u1\",\n  \"status\": \"IN_QUEUE\"\n}"
+                },
+                "Sync Result": {
+                  "value": "{\n  \"delayTime\": 1250,\n  \"executionTime\": 36808,\n  \"id\": \"a20e645a-a518-42ec-954c-2127ad50a6d1-u1\",\n  \"output\": {\n    \"image_url\": \"https://image.runpod.ai/gen-images/5/31/OedcZuz4db/0ac99957-a872-4232-b5f5-854b790fcec8.jpeg\",\n    \"message\": \"Image generated successfully\",\n    \"status\": \"success\"\n  },\n  \"status\": \"COMPLETED\",\n  \"workerId\": \"cupm07n9s2ywuo\"\n}"
+                }
+              },
               "schema": {
                 "type": "object",
                 "properties": {
-                  "input": {
+                  "id": {
+                    "type": "string",
+                    "example": "a20e645a-a518-42ec-954c-2127ad50a6d1-u1"
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "COMPLETED",
+                    "enum": ["IN_QUEUE", "IN_PROGRESS", "COMPLETED", "FAILED"]
+                  },
+                  "delayTime": {
+                    "type": "integer",
+                    "description": "Time in milliseconds before job processing started",
+                    "example": 1250
+                  },
+                  "executionTime": {
+                    "type": "integer",
+                    "description": "Time in milliseconds taken to generate the image",
+                    "example": 36808
+                  },
+                  "output": {
                     "type": "object",
                     "properties": {
-                      "prompt": {
+                      "image_url": {
                         "type": "string",
-                        "description": "Your input prompt for image generation.",
-                        "minLength": 1,
-                        "maxLength": 2000,
-                        "example": "a futuristic cityscape at night with neon lights, cyberpunk style, highly detailed"
+                        "format": "uri",
+                        "description": "URL of the generated image",
+                        "example": "https://image.runpod.ai/gen-images/5/31/OedcZuz4db/0ac99957-a872-4232-b5f5-854b790fcec8.jpeg"
                       },
-                      "negative_prompt": {
+                      "message": {
                         "type": "string",
-                        "description": "Specify things to not see in the output.",
-                        "default": "",
-                        "maxLength": 1000,
-                        "example": "blurry, low quality, distorted, watermark, signature"
+                        "description": "Human-readable message about the generation result",
+                        "example": "Image generated successfully"
                       },
-                      "height": {
-                        "type": "integer",
-                        "description": "Height of output image. Recommended: 1024. Common options: 512, 768, 1024, 1152, 1216",
-                        "default": 1024,
-                        "minimum": 512,
-                        "maximum": 1536,
-                        "enum": [512, 576, 640, 704, 768, 832, 896, 960, 1024, 1088, 1152, 1216, 1280, 1344, 1408, 1472, 1536],
-                        "example": 1024
-                      },
-                      "width": {
-                        "type": "integer",
-                        "description": "Width of output image. Recommended: 1024. Common options: 512, 768, 1024, 1152, 1216",
-                        "default": 1024,
-                        "minimum": 512,
-                        "maximum": 1536,
-                        "enum": [512, 576, 640, 704, 768, 832, 896, 960, 1024, 1088, 1152, 1216, 1280, 1344, 1408, 1472, 1536],
-                        "example": 1024
-                      },
-                      "num_outputs": {
-                        "type": "integer",
-                        "description": "The number of images to output. Range 1 - 4",
-                        "default": 1,
-                        "minimum": 1,
-                        "maximum": 4,
-                        "example": 1
-                      },
-                      "num_inference_steps": {
-                        "type": "integer",
-                        "description": "The number of denoising steps. Range: 20-100. Higher = better quality, slower generation",
-                        "default": 50,
-                        "minimum": 20,
-                        "maximum": 100,
-                        "example": 50
-                      },
-                      "guidance_scale": {
-                        "type": "number",
-                        "description": "Scale for classifier-free guidance. Higher values follow prompt more closely. Range: 1-20",
-                        "default": 7.5,
-                        "minimum": 1.0,
-                        "maximum": 20.0,
-                        "example": 7.5
-                      },
-                      "scheduler": {
+                      "status": {
                         "type": "string",
-                        "description": "Choose a scheduler for the diffusion process.",
-                        "default": "K_EULER",
-                        "enum": ["DDIM", "K_EULER", "DPMSolverMultistep", "K_EULER_ANCESTRAL", "PNDM", "KLMS"],
-                        "example": "K_EULER"
-                      },
-                      "seed": {
-                        "type": "integer",
-                        "description": "Random seed for reproducible results. Leave blank for random.",
-                        "minimum": 0,
-                        "maximum": 2147483647,
-                        "example": 42
-                      },
-                      "refine": {
-                        "type": "string",
-                        "description": "Which refine style to use for enhanced image quality.",
-                        "default": "expert_ensemble_refiner",
-                        "enum": ["expert_ensemble_refiner", "base_image_refiner", "no_refiner"],
-                        "example": "expert_ensemble_refiner"
-                      },
-                      "high_noise_frac": {
-                        "type": "number",
-                        "description": "For expert_ensemble_refiner, the fraction of noise to use during refinement. Range: 0.0-1.0",
-                        "default": 0.8,
-                        "minimum": 0.0,
-                        "maximum": 1.0,
-                        "example": 0.8
-                      },
-                      "prompt_strength": {
-                        "type": "number",
-                        "description": "How much influence the prompt has on the generation. Higher values follow prompt more closely.",
-                        "default": 0.8,
-                        "minimum": 0.1,
-                        "maximum": 1.0,
-                        "example": 0.8
-                      },
-                      "apply_watermark": {
-                        "type": "boolean",
-                        "description": "Whether to apply a watermark to the generated image.",
-                        "default": false,
-                        "example": false
+                        "description": "Status of the image generation",
+                        "example": "success",
+                        "enum": ["success", "failed", "error"]
                       }
-                    },
-                    "required": [
-                      "prompt"
-                    ],
-                    "additionalProperties": false
+                    }
                   },
-                  "webhook": {
+                  "workerId": {
                     "type": "string",
-                    "format": "uri",
-                    "description": "URL endpoint to receive a webhook call on job complete, fail, or timeout.",
-                    "example": "https://your-domain.com/webhook"
+                    "description": "Identifier of the worker that processed the job",
+                    "example": "cupm07n9s2ywuo"
                   }
-                },
-                "required": ["input"],
-                "additionalProperties": false
-              },
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "400",
+          "content": {
+            "application/json": {
               "examples": {
-                "basic_generation": {
-                  "summary": "Basic SDXL generation",
-                  "value": {
-                    "input": {
-                      "prompt": "a futuristic cityscape at night with neon lights",
-                      "height": 1024,
-                      "width": 1024,
-                      "num_inference_steps": 50,
-                      "guidance_scale": 7.5,
-                      "scheduler": "K_EULER"
-                    }
-                  }
-                },
-                "advanced_generation": {
-                  "summary": "Advanced generation with refiner",
-                  "value": {
-                    "input": {
-                      "prompt": "a majestic dragon flying over a medieval castle, fantasy art, highly detailed, epic composition",
-                      "negative_prompt": "blurry, low quality, distorted, watermark, signature, cartoon",
-                      "height": 1152,
-                      "width": 896,
-                      "num_outputs": 2,
-                      "num_inference_steps": 75,
-                      "guidance_scale": 8.5,
-                      "scheduler": "DPMSolverMultistep",
-                      "seed": 12345,
-                      "refine": "expert_ensemble_refiner",
-                      "high_noise_frac": 0.75,
-                      "prompt_strength": 0.9
-                    },
-                    "webhook": "https://your-domain.com/webhook"
-                  }
-                },
-                "portrait_generation": {
-                  "summary": "Portrait generation",
-                  "value": {
-                    "input": {
-                      "prompt": "professional headshot of a businesswoman, studio lighting, high resolution, photorealistic",
-                      "negative_prompt": "blurry, low quality, cartoon, anime",
-                      "height": 1216,
-                      "width": 832,
-                      "num_inference_steps": 60,
-                      "guidance_scale": 7.0,
-                      "refine": "expert_ensemble_refiner"
-                    }
+                "Result": {
+                  "value": "{\n  \"error\": \"INVALID_INPUT\",\n  \"message\": \"Invalid input parameters\"\n}"
+                }
+              },
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "example": "INVALID_INPUT"
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Invalid input parameters"
                   }
                 }
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "Unique job identifier",
-                      "example": "sdxl-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                    },
-                    "status": {
-                      "type": "string",
-                      "enum": ["IN_QUEUE", "IN_PROGRESS", "COMPLETED", "FAILED"],
-                      "description": "Current job status",
-                      "example": "COMPLETED"
-                    },
-                    "delayTime": {
-                      "type": "integer",
-                      "description": "Time in milliseconds before job processing started",
-                      "example": 1800
-                    },
-                    "executionTime": {
-                      "type": "integer",
-                      "description": "Time in milliseconds taken to generate the image(s)",
-                      "example": 28000
-                    },
-                    "output": {
-                      "type": "object",
-                      "properties": {
-                        "images": {
-                          "type": "array",
-                          "items": {
-                            "type": "string",
-                            "format": "uri"
-                          },
-                          "description": "Array of URLs for generated images",
-                          "example": [
-                            "https://image.runpod.ai/gen-images/sdxl/sample-output-1.jpeg",
-                            "https://image.runpod.ai/gen-images/sdxl/sample-output-2.jpeg"
-                          ]
-                        },
-                        "message": {
-                          "type": "string",
-                          "description": "Human-readable message about the generation result",
-                          "example": "Images generated successfully with SDXL"
-                        },
-                        "status": {
-                          "type": "string",
-                          "enum": ["success", "failed", "error"],
-                          "description": "Generation status",
-                          "example": "success"
-                        },
-                        "seed": {
-                          "type": "integer",
-                          "description": "Seed used for generation (useful for reproduction)",
-                          "example": 42
-                        }
-                      },
-                      "required": ["images", "message", "status"]
-                    },
-                    "workerId": {
-                      "type": "string",
-                      "description": "Identifier of the worker that processed the job",
-                      "example": "sdxl-worker-gpu24"
-                    }
-                  },
-                  "required": ["id", "status"]
-                },
-                "examples": {
-                  "async_result": {
-                    "summary": "Async execution result",
-                    "value": {
-                      "id": "sdxl-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-                      "status": "IN_QUEUE"
-                    }
-                  },
-                  "sync_result": {
-                    "summary": "Synchronous execution result",
-                    "value": {
-                      "delayTime": 1800,
-                      "executionTime": 28000,
-                      "id": "sdxl-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-                      "output": {
-                        "images": [
-                          "https://image.runpod.ai/gen-images/sdxl/sample-output-1.jpeg"
-                        ],
-                        "message": "Images generated successfully with SDXL",
-                        "status": "success",
-                        "seed": 42
-                      },
-                      "status": "COMPLETED",
-                      "workerId": "sdxl-worker-gpu24"
-                    }
-                  },
-                  "multiple_images_result": {
-                    "summary": "Multiple images result",
-                    "value": {
-                      "delayTime": 2200,
-                      "executionTime": 45000,
-                      "id": "sdxl-multiple-12345-67890",
-                      "output": {
-                        "images": [
-                          "https://image.runpod.ai/gen-images/sdxl/sample-1.jpeg",
-                          "https://image.runpod.ai/gen-images/sdxl/sample-2.jpeg",
-                          "https://image.runpod.ai/gen-images/sdxl/sample-3.jpeg"
-                        ],
-                        "message": "3 images generated successfully with SDXL",
-                        "status": "success",
-                        "seed": 12345
-                      },
-                      "status": "COMPLETED",
-                      "workerId": "sdxl-worker-gpu24"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request - Invalid input parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "INVALID_INPUT"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid dimensions: width and height must be supported SDXL resolutions"
-                    },
-                    "details": {
-                      "type": "object",
-                      "properties": {
-                        "field": {
-                          "type": "string",
-                          "example": "width"
-                        },
-                        "reason": {
-                          "type": "string",
-                          "example": "Value 999 is not in supported resolution list"
-                        },
-                        "supported_values": {
-                          "type": "array",
-                          "items": {
-                            "type": "integer"
-                          },
-                          "example": [512, 576, 640, 704, 768, 832, 896, 960, 1024, 1088, 1152, 1216]
-                        }
-                      }
-                    }
-                  },
-                  "required": ["error", "message"]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Invalid or missing API key",
-            "content": {
-              "text/plain": {
-                "example": "Unauthorized"
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests - Rate limit exceeded",
-            "content": {
-              "text/plain": {
-                "example": "Too Many Requests"
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "INTERNAL_SERVER_ERROR"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "An unexpected error occurred during SDXL generation"
-                    }
-                  },
-                  "required": ["error", "message"]
+        "401": {
+          "description": "401",
+          "content": {
+            "text/plain": {
+              "examples": {
+                "Result": {
+                  "value": "Unauthorized"
                 }
               }
             }
           }
         },
-        "tags": ["Stable Diffusion"],
-        "security": [
-          {
-            "BearerAuth": []
+        "429": {
+          "description": "429",
+          "content": {
+            "text/plain": {
+              "examples": {
+                "Result": {
+                  "value": "Too Many Requests"
+                }
+              }
+            }
           }
-        ]
-      }
+        }
+      },
+      "deprecated": false
     }
-  },
-  "components": {
-    "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "RunPod API key as Bearer token"
-      }
-    }
-  },
-  "tags": [
-    {
-      "name": "Stable Diffusion",
-      "description": "Stable Diffusion XL image generation with advanced features and refinement"
-    }
-  ]
+  }
 }
