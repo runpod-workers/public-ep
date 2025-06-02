@@ -37,3 +37,26 @@ def upload_to_r2(image_bytes, filename, content_type):
     return public_url
 
 
+def calculate_cost(width: int, height: int):
+    """
+    Calculate cost based on image dimensions and COST_PER_MEGAPX env variable.
+
+    Args:
+        width (int): Image width in pixels.
+        height (int): Image height in pixels.
+
+    Returns:
+        dict: Dictionary containing pixels, megapixels, and total cost in USD.
+    """
+    pixels = width * height
+    megapixels = pixels / 1_000_000
+
+    # Get cost from env, fallback to 0.00137 if not set
+    try:
+        cost_per_megapixel = float(os.getenv("COST_PER_MEGAPIXEL", "0.003"))
+    except ValueError:
+        raise ValueError("Invalid COST_PER_MEGAPX value in environment.")
+
+    cost_usd = round(megapixels * cost_per_megapixel, 6)
+
+    return cost_usd

@@ -37,3 +37,27 @@ def upload_to_r2(image_bytes, filename, content_type):
     now = datetime.now()
     public_url = f"{os.getenv('PUBLIC_URL')}/{filename}"
     return public_url
+
+
+import os
+
+def calculate_cost(num_images: int = 1):
+    """
+    Calculate flat cost based on number of images, using a per-image rate from ENV.
+
+    Args:
+        num_images (int): Number of images generated.
+
+    Returns:
+        dict: Cost per image and total cost in USD.
+    """
+    try:
+        cost_per_image = float(os.getenv("COST_PER_IMAGE", "0.003"))
+    except ValueError:
+        raise ValueError("Invalid COST_PER_IMAGE value in environment.")
+
+    total_cost = round(cost_per_image * num_images, 6)
+
+    return total_cost
+
+
