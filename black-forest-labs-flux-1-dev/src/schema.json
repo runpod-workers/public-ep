@@ -1,0 +1,202 @@
+{
+  "/black-forest-labs-flux-1-dev/{run_type}": {
+    "post": {
+      "summary": "FLUX-1-dev Image Generation",
+      "description": "Generate images using Black Forest Labs FLUX-1-dev model",
+      "operationId": "flux-1-dev",
+      "parameters": [
+        {
+          "name": "run_type",
+          "in": "path",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "run",
+              "runsync"
+            ],
+            "default": "runsync"
+          },
+          "required": true
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "input": {
+                  "properties": {
+                    "prompt": {
+                      "type": "string",
+                      "description": "Text description of the image to generate.",
+                      "default": "a photograph of a dog"
+                    },
+                    "negative_prompt": {
+                      "type": "string",
+                      "description": "Text description of what to avoid in the generated image.",
+                      "default": ""
+                    },
+                    "height": {
+                      "type": "integer",
+                      "description": "Height of the generated image in pixels. Must be multiple of 64. Range: 256-2048",
+                      "default": 1024,
+                      "format": "int32"
+                    },
+                    "width": {
+                      "type": "integer",
+                      "description": "Width of the generated image in pixels. Must be multiple of 64. Range: 256-2048",
+                      "default": 1024,
+                      "format": "int32"
+                    },
+                    "num_inference_steps": {
+                      "type": "integer",
+                      "description": "Number of denoising steps. More steps generally produce higher quality. Range: 1-50",
+                      "default": 25,
+                      "format": "int32"
+                    },
+                    "guidance": {
+                      "type": "number",
+                      "description": "Guidance scale. Higher values follow the prompt more closely. Range: 1.0-20.0",
+                      "default": 7.5,
+                      "format": "float"
+                    },
+                    "seed": {
+                      "type": "integer",
+                      "description": "Random seed for reproducible results. Use 0 for random seed.",
+                      "default": 0,
+                      "format": "int32"
+                    }
+                  },
+                  "required": [
+                    "prompt"
+                  ],
+                  "type": "object",
+                  "description": "Input object contains prompt and generation parameters."
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "200",
+          "content": {
+            "application/json": {
+              "examples": {
+                "Async Result": {
+                  "value": "{\n  \"id\": \"a20e645a-a518-42ec-954c-2127ad50a6d1-u1\",\n  \"status\": \"IN_QUEUE\"\n}"
+                },
+                "Sync Result": {
+                  "value": "{\n  \"delayTime\": 1250,\n  \"executionTime\": 36808,\n  \"id\": \"a20e645a-a518-42ec-954c-2127ad50a6d1-u1\",\n  \"output\": {\n    \"image_url\": \"https://image.runpod.ai/gen-images/5/31/OedcZuz4db/0ac99957-a872-4232-b5f5-854b790fcec8.jpeg\",\n    \"message\": \"Image generated successfully\",\n    \"status\": \"success\"\n  },\n  \"status\": \"COMPLETED\",\n  \"workerId\": \"cupm07n9s2ywuo\"\n}"
+                }
+              },
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "a20e645a-a518-42ec-954c-2127ad50a6d1-u1"
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "COMPLETED",
+                    "enum": ["IN_QUEUE", "IN_PROGRESS", "COMPLETED", "FAILED"]
+                  },
+                  "delayTime": {
+                    "type": "integer",
+                    "description": "Time in milliseconds before job processing started",
+                    "example": 1250
+                  },
+                  "executionTime": {
+                    "type": "integer",
+                    "description": "Time in milliseconds taken to generate the image",
+                    "example": 36808
+                  },
+                  "output": {
+                    "type": "object",
+                    "properties": {
+                      "image_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "URL of the generated image",
+                        "example": "https://image.runpod.ai/gen-images/5/31/OedcZuz4db/0ac99957-a872-4232-b5f5-854b790fcec8.jpeg"
+                      },
+                      "message": {
+                        "type": "string",
+                        "description": "Human-readable message about the generation result",
+                        "example": "Image generated successfully"
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "Status of the image generation",
+                        "example": "success",
+                        "enum": ["success", "failed", "error"]
+                      }
+                    }
+                  },
+                  "workerId": {
+                    "type": "string",
+                    "description": "Identifier of the worker that processed the job",
+                    "example": "cupm07n9s2ywuo"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "400",
+          "content": {
+            "application/json": {
+              "examples": {
+                "Result": {
+                  "value": "{\n  \"error\": \"INVALID_INPUT\",\n  \"message\": \"Invalid input parameters\"\n}"
+                }
+              },
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "example": "INVALID_INPUT"
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Invalid input parameters"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "401",
+          "content": {
+            "text/plain": {
+              "examples": {
+                "Result": {
+                  "value": "Unauthorized"
+                }
+              }
+            }
+          }
+        },
+        "429": {
+          "description": "429",
+          "content": {
+            "text/plain": {
+              "examples": {
+                "Result": {
+                  "value": "Too Many Requests"
+                }
+              }
+            }
+          }
+        }
+      },
+      "deprecated": false
+    }
+  }
+}
