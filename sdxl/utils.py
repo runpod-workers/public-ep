@@ -56,7 +56,7 @@ def calculate_cost(num_images: int = 1):
     except ValueError:
         raise ValueError("Invalid COST_PER_IMAGE value in environment.")
 
-    total_cost = round(cost_per_image * num_images, 6)
+    total_cost = round(cost_per_image * num_images, 8)
 
     return total_cost
 

@@ -57,6 +57,6 @@ def calculate_cost(width: int, height: int):
     except ValueError:
         raise ValueError("Invalid COST_PER_MEGAPX value in environment.")
 
-    cost_usd = round(megapixels * cost_per_megapixel, 6)
+    cost_usd = round(megapixels * cost_per_megapixel, 8)
 
     return cost_usd
