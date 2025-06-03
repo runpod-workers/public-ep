@@ -17,8 +17,6 @@ async def handler(job):
     try:
         img_url = flux_dev.generate(job_input)
         return {
-            "status": "success",
-            "message": "Image generated successfully",
             "image_url": img_url,
             "cost": calculate_cost(
                 job_input["width"], job_input["height"]

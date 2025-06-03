@@ -218,8 +218,6 @@ def generate_image(job):
 
 
     results = {
-        "status": "success",
-        "message": "Image generated successfully",
         "image_url": url,
         "cost": calculate_cost(
             job_input["num_images"]
