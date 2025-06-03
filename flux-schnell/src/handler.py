@@ -1,5 +1,6 @@
 import runpod
 from txt2img_flux_schnell import FluxSchnellGenerator
+from utils import calculate_cost
 
 flux = FluxSchnellGenerator()
 
@@ -20,6 +21,9 @@ async def handler(job):
             "status": "success",
             "message": "Image generated successfully",
             "image_url": img_url,
+            "cost": calculate_cost(
+                job_input["width"], job_input["height"]
+            ),
             # "image": base64_img,
             # "data_url": f"data:{mime_type};base64,{base64_img}",
         }

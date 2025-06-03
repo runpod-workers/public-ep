@@ -25,7 +25,7 @@ from utils import upload_to_r2
 import uuid
 from nanoid import generate
 from datetime import datetime
-
+from utils import calculate_cost
 from schemas import INPUT_SCHEMA
 
 torch.cuda.empty_cache()
@@ -221,6 +221,9 @@ def generate_image(job):
         "status": "success",
         "message": "Image generated successfully",
         "image_url": url,
+        "cost": calculate_cost(
+            job_input["num_images"]
+        )
     }
     
     return results
