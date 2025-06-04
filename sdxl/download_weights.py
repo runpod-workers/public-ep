@@ -1,9 +1,5 @@
 import torch
-from diffusers import (
-    StableDiffusionXLPipeline,
-    StableDiffusionXLImg2ImgPipeline,
-    AutoencoderKL,
-)
+from diffusers import StableDiffusionXLPipeline
 
 
 def fetch_pretrained_model(model_class, model_name, **kwargs):
@@ -23,32 +19,34 @@ def fetch_pretrained_model(model_class, model_name, **kwargs):
                 raise
 
 
-def get_diffusion_pipelines():
+def download_model_weights():
     """
-    Fetches the Stable Diffusion XL pipelines from the HuggingFace model hub.
+    Downloads SDXL model weights for Docker image baking.
     """
+    print("Downloading SDXL model weights...")
+    
+    # Download with bfloat16 precision (matching runtime usage)
     common_args = {
-        "torch_dtype": torch.float16,
-        "variant": "fp16",
+        "torch_dtype": torch.bfloat16,
         "use_safetensors": True,
+        "add_watermarker": False,
     }
 
+    # Download the main pipeline
     pipe = fetch_pretrained_model(
         StableDiffusionXLPipeline,
         "stabilityai/stable-diffusion-xl-base-1.0",
         **common_args,
     )
-    vae = fetch_pretrained_model(
-        AutoencoderKL, "madebyollin/sdxl-vae-fp16-fix", **{"torch_dtype": torch.float16}
-    )
-    refiner = fetch_pretrained_model(
-        StableDiffusionXLImg2ImgPipeline,
-        "stabilityai/stable-diffusion-xl-refiner-1.0",
-        **common_args,
-    )
-
-    return pipe, refiner, vae
+    
+    print("✓ SDXL base model downloaded successfully")
+    
+    # Clean up to save space during build
+    del pipe
+    torch.cuda.empty_cache() if torch.cuda.is_available() else None
+    
+    print("✓ Model weights cached for runtime use")
 
 
 if __name__ == "__main__":
-    get_diffusion_pipelines()
+    download_model_weights()
