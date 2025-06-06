@@ -75,7 +75,7 @@ class FluxDevGenerator:
         # Convert to base64
         buffered = io.BytesIO()
         now = datetime.now()
-        filename = f"gen-images/{now.month}/{now.day}/{generate(size=10)}/{uuid.uuid4()}.{img_format}"
+        filename = f"{now.month}/{now.day}/{generate(size=10)}/{uuid.uuid4()}.{img_format}"
         if img_format == "png":
             image.save(buffered, format="PNG")
             content_type = "image/png"
